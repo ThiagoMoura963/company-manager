@@ -13,7 +13,7 @@
     "start:prod": "node dist/main",
     "prettier:lint:fix": "prettier --write .",
     "prettier:lint:check": "prettier --check .",
-    "lint:eslint:check": "eslint --config backend/eslint.config.mjs backend/src",
+    "lint:eslint:check": "eslint --config eslint.config.mjs src",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -79,7 +79,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "cz-conventional-changelog"
     }
   },
   "engines": {
