@@ -13,5 +13,7 @@ jobs:
           node-version-file: 'backend/package.json'
 
       - run: npm ci
+        working-directory: backend
 
       - run: npm test
+        working-directory: backend

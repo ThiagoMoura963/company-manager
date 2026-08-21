@@ -14,8 +14,10 @@ jobs:
           node-version-file: 'backend/package.json'
 
       - run: npm ci
+        working-directory: backend
 
       - run: npm run prettier:lint:check
+        working-directory: backend
 
   eslint:
     name: eslint
@@ -28,8 +30,10 @@ jobs:
           node-version-file: 'backend/package.json'
 
       - run: npm ci
+        working-directory: backend
 
       - run: npm run lint:eslint:check
+        working-directory: backend
 
   commitlint:
     name: commitlint
@@ -44,5 +48,7 @@ jobs:
           node-version-file: 'backend/package.json'
 
       - run: npm ci
+        working-directory: backend
 
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+        working-directory: backend
