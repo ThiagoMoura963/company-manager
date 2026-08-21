@@ -11,7 +11,10 @@ import { HealthController } from './health.controller';
     CompaniesModule,
     DatabaseModule,
     EmailModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '../.env.development',
+    }),
   ],
   controllers: [HealthController],
 })
