@@ -1,3 +1,9 @@
+# Dependencies
+node_modules/
+
+# Compiled output
+dist/
+build/
 # compiled output
 /dist
 /node_modules
@@ -16,6 +22,11 @@ lerna-debug.log*
 .DS_Store
 
 # Tests
+coverage/
+.nyc_output/
+
+# IDEs and editors
+.idea/
 /coverage
 /.nyc_output
 
@@ -43,6 +54,8 @@ lerna-debug.log*
 .env.local
 
 # temp directory
+.temp/
+.tmp/
 .temp
 .tmp
 
@@ -52,5 +65,7 @@ pids
 *.seed
 *.pid.lock
 
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
