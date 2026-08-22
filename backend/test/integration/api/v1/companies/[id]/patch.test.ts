@@ -27,12 +27,51 @@ type CompanyResponse = {
   updated_at: string;
 };
 
+type ValidationErrorResponse = {
+  name: 'ValidationError';
+  message: string;
+  action: string;
+  status_code: 400;
+  key: string;
+};
+
 describe('PATCH /api/v1/companies/[id]', () => {
-  test('With unique `name`', async () => {
+  test('With duplicated `cnpj`', async () => {
+    const createdCompany = await orchestrator.createCompany({
+      cnpj: '69950103000119',
+    });
+
+    const response = await fetch(
+      `http://localhost:3000/api/v1/companies/${createdCompany.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cnpj: '69950103000119',
+        } satisfies UpdateCompanyInput),
+      },
+    );
+
+    expect(response.status).toBe(400);
+
+    const responseBody = (await response.json()) as ValidationErrorResponse;
+
+    expect(responseBody).toEqual({
+      name: 'ValidationError',
+      message: 'O cnpj informado já está sendo utilizado.',
+      action: 'Utilize outro cnpj para realizar esta operação.',
+      status_code: 400,
+      key: 'cnpj',
+    });
+  });
+
+  test('With unique `cnpj`', async () => {
     const createdCompany = await orchestrator.createCompany();
 
     const companyInput: UpdateCompanyInput = {
-      name: 'Empresa Atualizada',
+      cnpj: '46083197000170',
     };
 
     const response = await fetch(
@@ -52,8 +91,8 @@ describe('PATCH /api/v1/companies/[id]', () => {
 
     expect(responseBody).toEqual({
       id: responseBody.id,
-      name: 'Empresa Atualizada',
-      cnpj: createdCompany.cnpj,
+      name: createdCompany.name,
+      cnpj: '46083197000170',
       trade_name: createdCompany.trade_name,
       address: createdCompany.address,
       created_at: responseBody.created_at,
