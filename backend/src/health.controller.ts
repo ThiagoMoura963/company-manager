@@ -1,15 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { Pool } from 'pg';
+import { DATABASE_CONNECTION } from './database/database.constants';
 
 @Controller('/api/v1/health')
 export class HealthController {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(@Inject(DATABASE_CONNECTION) private readonly database: Pool) {}
 
   @Get()
-  check() {
+  async check() {
+    await this.database.query('SELECT 1 + 1;');
+
     return {
       status: 'ok',
-      appName: this.configService.get<string>('APP_NAME'),
     };
   }
 }
