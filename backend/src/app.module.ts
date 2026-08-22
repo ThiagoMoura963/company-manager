@@ -14,6 +14,7 @@ import { HealthController } from './health.controller';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '../.env.development',
+      expandVariables: true,
     }),
   ],
   controllers: [HealthController],

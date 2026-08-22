@@ -49,7 +49,7 @@ coverage/
 # dotenv environment variable files
 .env
 .env.*
-!.env.example
+!.env.development
 
 # temp directory
 .temp/
