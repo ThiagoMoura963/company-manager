@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
+import { NotFoundError, ValidationError } from 'src/errors/errors';
 import { DATABASE_CONNECTION } from 'src/database/database.constants';
 
 type CreateCompanyInput = {
@@ -46,7 +47,10 @@ export class CompaniesRepository {
     });
 
     if (results.rowCount === 0) {
-      throw new Error('Empresa não encontrada.');
+      throw new NotFoundError({
+        message: 'O id enviado não existe dentro do sistema.',
+        action: 'Verifique se o id está digitado corretamente',
+      });
     }
 
     return results.rows[0];
@@ -99,5 +103,27 @@ export class CompaniesRepository {
     });
 
     return results.rows[0];
+  }
+
+  async validateUniqueCnpj(cnpj: string) {
+    const results = await this.database.query({
+      text: `
+        SELECT
+          cnpj
+        FROM
+          companies
+        WHERE
+          LOWER(cnpj) = LOWER($1)
+        ;`,
+      values: [cnpj],
+    });
+
+    if (results.rows.length) {
+      throw new ValidationError({
+        message: 'O cnpj informado já está sendo utilizado.',
+        action: 'Utilize outro cnpj para realizar esta operação.',
+        key: 'cnpj',
+      });
+    }
   }
 }
