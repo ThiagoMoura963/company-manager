@@ -1,3 +1,15 @@
+import orchestrator from 'test/orchestrator';
+
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
+  orchestrator.runPendingMigrations();
+});
+
+afterAll(async () => {
+  await orchestrator.closeDatabase();
+});
+
 type CreateCompanyInput = {
   name: string;
   cnpj: string;
