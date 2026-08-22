@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
 
+import { faker } from '@faker-js/faker';
 import retry from 'async-retry';
 import { Pool } from 'pg';
 import migrator from './migrator';
@@ -13,6 +14,23 @@ if (!databaseUrl) {
 const database = new Pool({
   connectionString: databaseUrl,
 });
+
+type CreateCompanyInput = {
+  name: string;
+  cnpj: string;
+  trade_name: string;
+  address: string;
+};
+
+type Company = {
+  id: string;
+  name: string;
+  cnpj: string;
+  trade_name: string;
+  address: string;
+  created_at: Date;
+  updated_at: Date;
+};
 
 async function waitForAllServices() {
   await waitForWebService();
@@ -49,11 +67,43 @@ function runPendingMigrations(): void {
   });
 }
 
+async function createCompany(
+  companyObject: Partial<CreateCompanyInput> = {},
+): Promise<Company> {
+  const company: CreateCompanyInput = {
+    name: companyObject?.name || faker.company.name(),
+    cnpj: companyObject?.cnpj ?? faker.string.numeric(14),
+    trade_name: companyObject?.trade_name ?? faker.company.name(),
+    address:
+      companyObject?.address ||
+      `${faker.location.streetAddress()}, ${faker.location.city()} - ${faker.location.state(
+        {
+          abbreviated: true,
+        },
+      )}`,
+  };
+
+  const results = await database.query<Company>({
+    text: `
+      INSERT INTO
+        companies (name, cnpj, trade_name, address)
+      VALUES 
+        ($1, $2, $3, $4)
+      RETURNING
+        *
+      ;`,
+    values: [company.name, company.cnpj, company.trade_name, company.address],
+  });
+
+  return results.rows[0];
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
-  runPendingMigrations,
   closeDatabase,
+  runPendingMigrations,
+  createCompany,
 };
 
 export default orchestrator;
