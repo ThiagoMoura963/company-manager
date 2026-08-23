@@ -118,6 +118,27 @@ export class CompaniesRepository {
     return results.rows[0];
   }
 
+  async delete(id: string) {
+    const results = await this.database.query({
+      text: `
+        DELETE FROM
+          companies
+        WHERE
+          id = $1
+        RETURNING
+          *
+        ;`,
+      values: [id],
+    });
+
+    if (results.rowCount === 0) {
+      throw new NotFoundError({
+        message: 'O id enviado não existe dentro do sistema.',
+        action: 'Verifique se o id está digitado corretamente.',
+      });
+    }
+  }
+
   async validateUniqueCnpj(cnpj: string) {
     const results = await this.database.query({
       text: `
