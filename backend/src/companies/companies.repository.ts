@@ -31,6 +31,19 @@ type Company = {
 export class CompaniesRepository {
   constructor(@Inject(DATABASE_CONNECTION) private readonly database: Pool) {}
 
+  async findAll() {
+    const results = await this.database.query<Company[]>({
+      text: `
+        SELECT 
+          *
+        FROM
+          companies
+        ;`,
+    });
+
+    return results.rows;
+  }
+
   async findOneById(id: string) {
     const results = await this.database.query<Company>({
       text: `
@@ -49,7 +62,7 @@ export class CompaniesRepository {
     if (results.rowCount === 0) {
       throw new NotFoundError({
         message: 'O id enviado não existe dentro do sistema.',
-        action: 'Verifique se o id está digitado corretamente',
+        action: 'Verifique se o id está digitado corretamente.',
       });
     }
 

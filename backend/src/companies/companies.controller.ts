@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 
 type CreateCompanyInput = {
@@ -18,6 +18,16 @@ type UpdateCompanyInput = {
 @Controller('api/v1/companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}
+
+  @Get()
+  async findAll() {
+    return this.companiesService.findAll();
+  }
+
+  @Get(':id')
+  async findOneById(@Param('id') id: string) {
+    return this.companiesService.findOneById(id);
+  }
 
   @Post()
   async create(@Body() body: CreateCompanyInput) {
