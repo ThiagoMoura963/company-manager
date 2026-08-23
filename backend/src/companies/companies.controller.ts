@@ -9,21 +9,10 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+
 import { CompaniesService } from './companies.service';
-
-type CreateCompanyInput = {
-  name: string;
-  cnpj: string;
-  trade_name: string;
-  address: string;
-};
-
-type UpdateCompanyInput = {
-  name?: string;
-  cnpj?: string;
-  trade_name?: string;
-  address?: string;
-};
+import { UpdateCompanyDto } from 'test/integration/api/v1/companies/dto/update-company.dto';
+import { CreateCompanyDto } from 'test/integration/api/v1/companies/dto/create-company.dto';
 
 @Controller('api/v1/companies')
 export class CompaniesController {
@@ -40,12 +29,12 @@ export class CompaniesController {
   }
 
   @Post()
-  async create(@Body() body: CreateCompanyInput) {
+  async create(@Body() body: CreateCompanyDto) {
     return this.companiesService.create(body);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: UpdateCompanyInput) {
+  async update(@Param('id') id: string, @Body() body: UpdateCompanyDto) {
     return this.companiesService.update(id, body);
   }
 
