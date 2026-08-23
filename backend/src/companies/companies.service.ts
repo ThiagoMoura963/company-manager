@@ -46,4 +46,8 @@ export class CompaniesService {
 
     return this.repository.update(id, companyWithNewValues);
   }
+
+  async delete(id: string) {
+    await this.repository.delete(id);
+  }
 }

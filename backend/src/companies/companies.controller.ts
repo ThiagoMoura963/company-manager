@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 
 type CreateCompanyInput = {
@@ -37,5 +47,11 @@ export class CompaniesController {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: UpdateCompanyInput) {
     return this.companiesService.update(id, body);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string) {
+    await this.companiesService.delete(id);
   }
 }
