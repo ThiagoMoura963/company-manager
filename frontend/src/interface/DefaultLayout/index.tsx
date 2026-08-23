@@ -3,7 +3,9 @@ import { OrganizationIcon } from '@primer/octicons-react';
 import React, { useEffect } from 'react';
 import styles from '../DefaultLayout/index.module.css';
 
-type ContentWidth = 'small' | 'medium' | 'large' | 'xlarge';
+type ContentWidth = 'small' | 'medium' | 'large' | 'xlarge' | 'full';
+
+type PrimerContentWidth = Exclude<ContentWidth, 'small'>;
 
 type DefaultLayoutMetadata = {
   title?: string;
@@ -17,7 +19,7 @@ type DefaultLayoutProps = {
 };
 
 const contentWidthClasses: Partial<Record<ContentWidth, string>> = {
-  small: styles.contentSmall,
+  small: styles.smallContent,
 };
 
 export default function DefaultLayout({
@@ -29,7 +31,8 @@ export default function DefaultLayout({
     ? contentWidthClasses[contentWidth]
     : undefined;
 
-  const primerWidth = contentWidth === 'small' ? undefined : contentWidth;
+  const primerWidth: PrimerContentWidth | undefined =
+    contentWidth === 'small' ? undefined : contentWidth;
 
   useEffect(() => {
     document.title = metadata.title
@@ -61,9 +64,7 @@ export default function DefaultLayout({
           </Header.Link>
         </Header.Item>
         <Header.Item>
-          <Header.Link href="/companies/new">
-            Cadastrar Nova Empresa
-          </Header.Link>
+          <Header.Link href="/empresas/cadastrar">Cadastrar</Header.Link>
         </Header.Item>
       </Header>
 
@@ -74,8 +75,8 @@ export default function DefaultLayout({
         >
           {children}
         </PageLayout.Content>
-        <PageLayout.Footer divider="line">
-          <Text>© {new Date().getFullYear()} Gerenciado de Empresas</Text>
+        <PageLayout.Footer className={styles.footerText} divider="line">
+          <Text>© {new Date().getFullYear()} Gerenciador de Empresas</Text>
         </PageLayout.Footer>
       </PageLayout>
     </>

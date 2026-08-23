@@ -1,8 +1,12 @@
-.scamllContent {
-  max-width: 27rem;
+.smallContent {
+  max-width: 30rem;
   margin-inline: auto;
 }
 
 .organizationIcon {
   margin-right: 0.5rem;
+}
+
+.footerText {
+  text-align: center;
 }
