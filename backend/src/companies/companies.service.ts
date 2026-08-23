@@ -19,6 +19,14 @@ type UpdateCompanyInput = {
 export class CompaniesService {
   constructor(private readonly repository: CompaniesRepository) {}
 
+  async findAll() {
+    return this.repository.findAll();
+  }
+
+  async findOneById(id: string) {
+    return await this.repository.findOneById(id);
+  }
+
   async create(companyInputValues: CreateCompanyInput) {
     await this.repository.validateUniqueCnpj(companyInputValues.cnpj);
 
