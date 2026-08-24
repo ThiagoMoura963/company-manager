@@ -36,6 +36,40 @@ type Company = {
   updated_at: Date;
 };
 
+function generateValidCnpj(): string {
+  const numbers = Array.from({ length: 12 }, () =>
+    faker.number.int({ min: 0, max: 9 }),
+  );
+
+  let sum = 0;
+  let weight = 5;
+
+  for (let i = 0; i < 12; i++) {
+    sum += numbers[i] * weight;
+    weight = weight === 2 ? 9 : weight - 1;
+  }
+
+  let remainder = sum % 11;
+  const firstDigit = remainder < 2 ? 0 : 11 - remainder;
+
+  numbers.push(firstDigit);
+
+  sum = 0;
+  weight = 6;
+
+  for (let i = 0; i < 13; i++) {
+    sum += numbers[i] * weight;
+    weight = weight === 2 ? 9 : weight - 1;
+  }
+
+  remainder = sum % 11;
+  const secondDigit = remainder < 2 ? 0 : 11 - remainder;
+
+  numbers.push(secondDigit);
+
+  return numbers.join('');
+}
+
 const emailHttpUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
 async function waitForAllServices() {
@@ -102,7 +136,7 @@ async function createCompany(
 ): Promise<Company> {
   const company: CreateCompanyInput = {
     name: companyObject?.name || faker.company.name(),
-    cnpj: companyObject?.cnpj ?? faker.string.numeric(14),
+    cnpj: companyObject?.cnpj ?? generateValidCnpj(),
     trade_name: companyObject?.trade_name ?? faker.company.name(),
     address:
       companyObject?.address ||
