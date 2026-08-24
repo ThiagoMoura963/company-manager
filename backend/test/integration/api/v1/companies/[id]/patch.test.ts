@@ -257,7 +257,7 @@ describe('PATCH /api/v1/companies/[id]', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          cnpj: '1144477700016',
+          cnpj: '05.629.302/0001-4',
         } satisfies UpdateCompanyInput),
       },
     );
@@ -286,7 +286,7 @@ describe('PATCH /api/v1/companies/[id]', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          cnpj: '114447770001611',
+          cnpj: '05.629.302/0001-477',
         } satisfies UpdateCompanyInput),
       },
     );
@@ -307,7 +307,7 @@ describe('PATCH /api/v1/companies/[id]', () => {
   test('With `cnpj` already in use by another company', async () => {
     const createdCompany = await orchestrator.createCompany();
     const otherCompany = await orchestrator.createCompany();
-
+    console.log(otherCompany.cnpj);
     const response = await fetch(
       `http://localhost:3000/api/v1/companies/${createdCompany.id}`,
       {

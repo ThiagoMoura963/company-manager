@@ -40,7 +40,7 @@ describe('POST /api/v1/companies', () => {
   test('With unique and valid data', async () => {
     const companyInput: CreateCompanyInput = {
       name: 'Empresa Teste',
-      cnpj: '98167650000120',
+      cnpj: '44472328000186',
       trade_name: 'Empresa Teste',
       address: 'Santos - SP',
     };
@@ -99,7 +99,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa A',
         trade_name: 'Empresa A',
-        cnpj: '12345678000190',
+        cnpj: '99.125.883/0001-23',
         address: 'Rio de Janeiro - RJ',
       } satisfies CreateCompanyInput),
     });
@@ -114,7 +114,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa B',
         trade_name: 'Empresa B',
-        cnpj: '12345678000190',
+        cnpj: '99.125.883/0001-23',
         address: 'São Paulo - SP',
       } satisfies CreateCompanyInput),
     });
@@ -141,7 +141,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: '',
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies CreateCompanyInput),
     });
@@ -167,7 +167,7 @@ describe('POST /api/v1/companies', () => {
       },
       body: JSON.stringify({
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies Omit<CreateCompanyInput, 'name'>),
     });
@@ -194,7 +194,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 123456,
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies Omit<CreateCompanyInput, 'name'> & { name: number }),
     });
@@ -274,7 +274,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 'Empresa C',
-        cnpj: 11444777000161,
+        cnpj: 44472328000186,
         address: 'Curitiba - PR',
       } satisfies Omit<CreateCompanyInput, 'cnpj'> & { cnpj: number }),
     });
@@ -301,7 +301,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 'Empresa C',
-        cnpj: '1144477700016',
+        cnpj: '44.472.328/0001-8',
         address: 'Curitiba - PR',
       } satisfies CreateCompanyInput),
     });
@@ -328,7 +328,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 'Empresa C',
-        cnpj: '114447770001611',
+        cnpj: '444.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies CreateCompanyInput),
     });
@@ -357,7 +357,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: longName,
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies CreateCompanyInput),
     });
@@ -384,7 +384,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: '',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies CreateCompanyInput),
     });
@@ -410,7 +410,7 @@ describe('POST /api/v1/companies', () => {
       },
       body: JSON.stringify({
         name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies Omit<CreateCompanyInput, 'trade_name'>),
     });
@@ -437,7 +437,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 123456,
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 'Curitiba - PR',
       } satisfies Omit<CreateCompanyInput, 'trade_name'> & {
         trade_name: number;
@@ -466,7 +466,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: '',
       } satisfies CreateCompanyInput),
     });
@@ -493,7 +493,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
       } satisfies Omit<CreateCompanyInput, 'address'>),
     });
 
@@ -519,7 +519,7 @@ describe('POST /api/v1/companies', () => {
       body: JSON.stringify({
         name: 'Empresa C',
         trade_name: 'Empresa C',
-        cnpj: '11444777000161',
+        cnpj: '44.472.328/0001-86',
         address: 123456,
       } satisfies Omit<CreateCompanyInput, 'address'> & { address: number }),
     });

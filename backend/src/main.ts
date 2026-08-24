@@ -18,6 +18,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       stopAtFirstError: true,
+      transform: true,
 
       exceptionFactory: (errors): ValidationError => {
         const [error] = errors;

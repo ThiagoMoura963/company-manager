@@ -9,6 +9,8 @@ import {
 } from '@primer/react';
 
 import DefaultLayout from '../../interface/DefaultLayout';
+import { formatCnpj, formatDate } from '../../interface';
+
 import { DataTable, SkeletonText, Table } from '@primer/react/experimental';
 import { PlusIcon, PencilIcon, TrashIcon } from '@primer/octicons-react';
 
@@ -25,13 +27,6 @@ type Company = {
   created_at: string;
   updated_at: string;
 };
-
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat('pt-BR', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  }).format(new Date(date));
-}
 
 async function fetchAPI<T>(key: string): Promise<T> {
   const response = await fetch(key);
@@ -132,6 +127,7 @@ function CompanyList() {
             {
               header: 'CNPJ',
               field: 'cnpj',
+              renderCell: (row) => formatCnpj(row.cnpj),
             },
             {
               header: 'Nome Fantasia',

@@ -64,6 +64,9 @@ export default function DefaultLayout({
           </Header.Link>
         </Header.Item>
         <Header.Item>
+          <Header.Link href="/empresas">Empresas</Header.Link>
+        </Header.Item>
+        <Header.Item>
           <Header.Link href="/empresas/cadastrar">Cadastrar</Header.Link>
         </Header.Item>
       </Header>
