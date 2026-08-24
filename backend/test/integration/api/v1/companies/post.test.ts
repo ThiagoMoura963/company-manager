@@ -4,6 +4,7 @@ beforeAll(async () => {
   await orchestrator.waitForAllServices();
   await orchestrator.clearDatabase();
   orchestrator.runPendingMigrations();
+  await orchestrator.deleteAllEmails();
 });
 
 afterAll(async () => {
@@ -72,6 +73,21 @@ describe('POST /api/v1/companies', () => {
 
     expect(Date.parse(responseBody.created_at)).not.toBeNaN();
     expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+
+    const lastEmail = await orchestrator.getLastEmail();
+
+    expect(lastEmail).not.toBeNull();
+    expect(lastEmail?.sender).toBe('<no-reply@company-manager.local>');
+    expect(lastEmail?.recipients[0]).toBe('<admin@company-manager.local>');
+    expect(lastEmail?.subject).toBe('Nova empresa cadastrada');
+
+    expect(lastEmail?.text).toContain('Nova empresa foi cadastrada.');
+    expect(lastEmail?.text).toContain(`Nome: ${companyInput.name}`);
+    expect(lastEmail?.text).toContain(`CNPJ: ${companyInput.cnpj}`);
+    expect(lastEmail?.text).toContain(
+      `Nome Fantasia: ${companyInput.trade_name}`,
+    );
+    expect(lastEmail?.text).toContain(`Endereço: ${companyInput.address}`);
   });
 
   test('With duplicated `cnpj`', async () => {

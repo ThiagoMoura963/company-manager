@@ -3,9 +3,10 @@ import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
 import { DatabaseModule } from 'src/database/database.module';
 import { CompaniesRepository } from './companies.repository';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, EmailModule],
   controllers: [CompaniesController],
   providers: [CompaniesService, CompaniesRepository],
 })

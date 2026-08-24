@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CompaniesRepository } from './companies.repository';
+import { EmailService } from 'src/email/email.service';
+import { ConfigService } from '@nestjs/config';
 
 type CreateCompanyInput = {
   name: string;
@@ -17,7 +19,11 @@ type UpdateCompanyInput = {
 
 @Injectable()
 export class CompaniesService {
-  constructor(private readonly repository: CompaniesRepository) {}
+  constructor(
+    private readonly repository: CompaniesRepository,
+    private readonly emailService: EmailService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async findAll() {
     return this.repository.findAll();
@@ -30,7 +36,22 @@ export class CompaniesService {
   async create(companyInputValues: CreateCompanyInput) {
     await this.repository.validateUniqueCnpj(companyInputValues.cnpj);
 
-    return this.repository.create(companyInputValues);
+    const newCompany = await this.repository.create(companyInputValues);
+
+    await this.emailService.send({
+      to: this.configService.getOrThrow<string>('EMAIL_NOTIFICATION_TO'),
+      subject: 'Nova empresa cadastrada',
+      text: `
+Nova empresa foi cadastrada.
+
+Nome: ${newCompany.name}
+CNPJ: ${newCompany.cnpj}
+Nome Fantasia: ${newCompany.trade_name}
+Endereço: ${newCompany.address}
+      `,
+    });
+
+    return newCompany;
   }
 
   async update(id: string, companyInputValues: UpdateCompanyInput) {

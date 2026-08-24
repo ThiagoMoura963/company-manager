@@ -182,6 +182,7 @@ function CompanyList() {
                     icon={TrashIcon}
                     variant="invisible"
                     onClick={() => setCompanyToDelete(row)}
+                    disabled={deletingId === row.id}
                   />
                 </>
               ),
