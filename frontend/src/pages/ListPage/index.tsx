@@ -140,7 +140,7 @@ function CompanyList() {
                   icon={PencilIcon}
                   variant="invisible"
                   as="a"
-                  href={`/empresas/${row.id}/editar`}
+                  href={`/empresas/editar/${row.id}`}
                 />
 
                 <IconButton
