@@ -1,19 +1,11 @@
-import {
-  Stack,
-  Heading,
-  FormControl,
-  TextInput,
-  Button,
-  Banner,
-} from '@primer/react';
+import { Banner, Button, Heading, Stack } from '@primer/react';
 import { SkeletonText } from '@primer/react/experimental';
 import { ArrowLeftIcon } from '@primer/octicons-react';
-
 import DefaultLayout from '../../interface/DefaultLayout';
+import FormField from '../../interface/FormField';
 import type React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
-
 import { createErrorMessage, formatCnpj } from '../../interface';
 import useSWR from 'swr';
 
@@ -30,11 +22,22 @@ type Company = CompanyFormData & {
   updated_at: string;
 };
 
+type ApiErrorResponse = {
+  name?: string;
+  message?: string;
+  action?: string;
+  status_code?: number;
+  key?: string;
+};
+
 async function fetchAPI<T>(url: string): Promise<T> {
   const response = await fetch(url);
-  const responseBody = await response.json();
 
-  return responseBody;
+  if (!response.ok) {
+    throw new Error('Não foi possível carregar a empresa');
+  }
+
+  return response.json();
 }
 
 export default function EditPage() {
@@ -88,7 +91,9 @@ function EditForm({ companyId }: EditFormProps) {
   const [cnpj, setCnpj] = useState<string>();
   const [tradeName, setTradeName] = useState<string>();
   const [address, setAddress] = useState<string>();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<keyof CompanyFormData, string>>
   >({});
@@ -124,15 +129,16 @@ function EditForm({ companyId }: EditFormProps) {
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (!companyId) {
+      return;
+    }
+
+    setIsSubmitting(true);
     setFieldErrors({});
     setGlobalMessage(null);
 
-    if (!companyId) return;
-
-    setIsSubmitting(true);
-
     try {
-      const requestBody = {
+      const requestBody: CompanyFormData = {
         name: currentName,
         cnpj: currentCnpj,
         trade_name: currentTradeName,
@@ -150,7 +156,7 @@ function EditForm({ companyId }: EditFormProps) {
         },
       );
 
-      const responseBody = await response.json();
+      const responseBody = (await response.json()) as ApiErrorResponse;
 
       if (response.status === 200) {
         navigate('/empresas');
@@ -186,76 +192,45 @@ function EditForm({ companyId }: EditFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap="normal">
-        <FormControl>
-          <FormControl.Label>Nome</FormControl.Label>
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: Acme Tecnologia Ltda."
-            value={currentName}
-            onChange={(event) => setName(event.target.value)}
-          />
-          {fieldErrors.name && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.name}
-            </FormControl.Validation>
-          )}
-        </FormControl>
+        <FormField
+          label="Nome"
+          size="large"
+          type="text"
+          placeholder="Ex.: Acme Tecnologia Ltda."
+          value={currentName}
+          onChange={(event) => setName(event.target.value)}
+          error={fieldErrors.name}
+        />
 
-        <FormControl>
-          <FormControl.Label>CNPJ</FormControl.Label>
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: 12.345.678/0001-90"
-            value={currentCnpj}
-            onChange={(event) => setCnpj(formatCnpj(event.target.value))}
-          />
+        <FormField
+          label="CNPJ"
+          size="large"
+          type="text"
+          placeholder="Ex.: 12.345.678/0001-90"
+          value={formatCnpj(currentCnpj)}
+          onChange={(event) => setCnpj(formatCnpj(event.target.value))}
+          error={fieldErrors.cnpj}
+        />
 
-          {fieldErrors.cnpj && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.cnpj}
-            </FormControl.Validation>
-          )}
-        </FormControl>
+        <FormField
+          label="Nome Fantasia"
+          size="large"
+          type="text"
+          placeholder="Ex.: Acme Tech"
+          value={currentTradeName}
+          onChange={(event) => setTradeName(event.target.value)}
+          error={fieldErrors.trade_name}
+        />
 
-        <FormControl>
-          <FormControl.Label>Nome Fantasia</FormControl.Label>
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: Acme Tech"
-            value={currentTradeName}
-            onChange={(event) => setTradeName(event.target.value)}
-          />
-
-          {fieldErrors.trade_name && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.trade_name}
-            </FormControl.Validation>
-          )}
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label>Endereço</FormControl.Label>
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: Av. Paulista, 1000 - São Paulo/SP"
-            value={currentAddress}
-            onChange={(event) => setAddress(event.target.value)}
-          />
-
-          {fieldErrors.address && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.address}
-            </FormControl.Validation>
-          )}
-        </FormControl>
+        <FormField
+          label="Endereço"
+          size="large"
+          type="text"
+          placeholder="Ex.: Av. Paulista, 1000 - São Paulo/SP"
+          value={currentAddress}
+          onChange={(event) => setAddress(event.target.value)}
+          error={fieldErrors.address}
+        />
 
         {globalMessage && <Banner variant="critical" title={globalMessage} />}
 

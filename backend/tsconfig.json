@@ -24,6 +24,11 @@
     "noFallthroughCasesInSwitch": false,
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "jest.config.ts"],
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "jest.config.ts",
+    "scripts/**/*.ts"
+  ],
   "exclude": ["dist", "node_modules", "infra/migrations"]
 }

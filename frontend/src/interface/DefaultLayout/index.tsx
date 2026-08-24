@@ -1,6 +1,9 @@
 import { PageLayout, Header, Text } from '@primer/react';
 import { OrganizationIcon } from '@primer/octicons-react';
-import React, { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import styles from '../DefaultLayout/index.module.css';
 
 type ContentWidth = 'small' | 'medium' | 'large' | 'xlarge' | 'full';
@@ -27,6 +30,8 @@ export default function DefaultLayout({
   metadata = {},
   contentWidth,
 }: DefaultLayoutProps) {
+  const navigate = useNavigate();
+
   const extraContentClassName = contentWidth
     ? contentWidthClasses[contentWidth]
     : undefined;
@@ -34,27 +39,29 @@ export default function DefaultLayout({
   const primerWidth: PrimerContentWidth | undefined =
     contentWidth === 'small' ? undefined : contentWidth;
 
-  useEffect(() => {
-    document.title = metadata.title
-      ? `${metadata.title} · Gerenciador de Empresas`
-      : 'Gerenciador de Empresas';
-
-    if (metadata.description) {
-      let meta = document.querySelector('meta[name="description"]');
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('name', 'description');
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute('content', metadata.description);
-    }
-  }, [metadata.title, metadata.description]);
+  const title = metadata.title
+    ? `${metadata.title} · Gerenciador de Empresas`
+    : 'Gerenciador de Empresas';
 
   return (
     <>
+      <Helmet>
+        <title>{title}</title>
+
+        {metadata.description && (
+          <meta name="description" content={metadata.description} />
+        )}
+      </Helmet>
+
       <Header>
         <Header.Item full>
-          <Header.Link href="/">
+          <Header.Link
+            href="/"
+            onClick={(event) => {
+              event.preventDefault();
+              navigate('/');
+            }}
+          >
             <OrganizationIcon
               size={30}
               verticalAlign="middle"
@@ -63,11 +70,29 @@ export default function DefaultLayout({
             <Text size="large">Gerenciador de Empresas</Text>
           </Header.Link>
         </Header.Item>
+
         <Header.Item>
-          <Header.Link href="/empresas">Empresas</Header.Link>
+          <Header.Link
+            href="/empresas"
+            onClick={(event) => {
+              event.preventDefault();
+              navigate('/empresas');
+            }}
+          >
+            Empresas
+          </Header.Link>
         </Header.Item>
+
         <Header.Item>
-          <Header.Link href="/empresas/cadastrar">Cadastrar</Header.Link>
+          <Header.Link
+            href="/empresas/cadastrar"
+            onClick={(event) => {
+              event.preventDefault();
+              navigate('/empresas/cadastrar');
+            }}
+          >
+            Cadastrar
+          </Header.Link>
         </Header.Item>
       </Header>
 
@@ -78,6 +103,7 @@ export default function DefaultLayout({
         >
           {children}
         </PageLayout.Content>
+
         <PageLayout.Footer className={styles.footerText} divider="line">
           <Text>© {new Date().getFullYear()} Gerenciador de Empresas</Text>
         </PageLayout.Footer>

@@ -1,18 +1,9 @@
-import {
-  Banner,
-  FormControl,
-  Heading,
-  Stack,
-  TextInput,
-  Button,
-} from '@primer/react';
+import { Banner, Heading, Stack, Button } from '@primer/react';
 import { ArrowLeftIcon } from '@primer/octicons-react';
-
 import DefaultLayout from '../../interface/DefaultLayout';
-
+import FormField from '../../interface/FormField';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { createErrorMessage, formatCnpj } from '../../interface';
 
 type CompanyFormData = {
@@ -53,6 +44,7 @@ export default function RegisterPage() {
         </Stack>
 
         <Heading as="h1">Cadastrar Empresa</Heading>
+
         <RegisterForm navigate={navigate} />
       </Stack>
     </DefaultLayout>
@@ -68,7 +60,6 @@ function RegisterForm({ navigate }: RegisterFormProps) {
   const [cnpj, setCnpj] = useState('');
   const [tradeName, setTradeName] = useState('');
   const [address, setAddress] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
 
   const [fieldErrors, setFieldErrors] = useState<
@@ -145,81 +136,45 @@ function RegisterForm({ navigate }: RegisterFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap="normal">
-        <FormControl>
-          <FormControl.Label>Nome da Empresa</FormControl.Label>
+        <FormField
+          label="Nome da Empresa"
+          size="large"
+          type="text"
+          placeholder="Ex.: Acme Tecnologia Ltda."
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          error={fieldErrors.name}
+        />
 
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: Acme Tecnologia Ltda."
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
+        <FormField
+          label="CNPJ"
+          size="large"
+          type="text"
+          placeholder="Ex.: 12.345.678/0001-90"
+          value={cnpj}
+          onChange={(event) => setCnpj(formatCnpj(event.target.value))}
+          error={fieldErrors.cnpj}
+        />
 
-          {fieldErrors.name && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.name}
-            </FormControl.Validation>
-          )}
-        </FormControl>
+        <FormField
+          label="Nome Fantasia"
+          size="large"
+          type="text"
+          placeholder="Ex.: Acme Tech"
+          value={tradeName}
+          onChange={(event) => setTradeName(event.target.value)}
+          error={fieldErrors.trade_name}
+        />
 
-        <FormControl>
-          <FormControl.Label>CNPJ</FormControl.Label>
-
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: 12.345.678/0001-90"
-            value={cnpj}
-            onChange={(event) => setCnpj(formatCnpj(event.target.value))}
-          />
-
-          {fieldErrors.cnpj && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.cnpj}
-            </FormControl.Validation>
-          )}
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label>Nome Fantasia</FormControl.Label>
-
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: Acme Tech"
-            value={tradeName}
-            onChange={(event) => setTradeName(event.target.value)}
-          />
-
-          {fieldErrors.trade_name && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.trade_name}
-            </FormControl.Validation>
-          )}
-        </FormControl>
-
-        <FormControl>
-          <FormControl.Label>Endereço</FormControl.Label>
-
-          <TextInput
-            block
-            size="large"
-            type="text"
-            placeholder="Ex.: Av. Paulista, 1000 - São Paulo/SP"
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-          />
-
-          {fieldErrors.address && (
-            <FormControl.Validation variant="error">
-              {fieldErrors.address}
-            </FormControl.Validation>
-          )}
-        </FormControl>
+        <FormField
+          label="Endereço"
+          size="large"
+          type="text"
+          placeholder="Ex.: Av. Paulista, 1000 - São Paulo/SP"
+          value={address}
+          onChange={(event) => setAddress(event.target.value)}
+          error={fieldErrors.address}
+        />
 
         {globalMessage && <Banner variant="critical" title={globalMessage} />}
 
@@ -231,7 +186,7 @@ function RegisterForm({ navigate }: RegisterFormProps) {
           disabled={isLoading}
           loading={isLoading}
         >
-          Criar empresa
+          Cadastrar empresa
         </Button>
       </Stack>
     </form>
