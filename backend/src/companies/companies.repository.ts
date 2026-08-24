@@ -38,6 +38,9 @@ export class CompaniesRepository {
           *
         FROM
           companies
+        ORDER BY 
+          created_at DESC,
+          name DESC
         ;`,
     });
 

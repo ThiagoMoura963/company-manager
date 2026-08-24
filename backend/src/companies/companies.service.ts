@@ -57,10 +57,12 @@ Endereço: ${newCompany.address}
   async update(id: string, companyInputValues: UpdateCompanyInput) {
     const currentCompany = await this.repository.findOneById(id);
 
-    if ('cnpj' in companyInputValues) {
-      if (companyInputValues.cnpj !== undefined) {
-        await this.repository.validateUniqueCnpj(companyInputValues.cnpj);
-      }
+    if (
+      'cnpj' in companyInputValues &&
+      companyInputValues.cnpj !== undefined &&
+      companyInputValues.cnpj !== currentCompany.cnpj
+    ) {
+      await this.repository.validateUniqueCnpj(companyInputValues.cnpj);
     }
 
     const companyWithNewValues = { ...currentCompany, ...companyInputValues };

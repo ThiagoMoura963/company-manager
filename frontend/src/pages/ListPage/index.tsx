@@ -6,16 +6,18 @@ import {
   Text,
   IconButton,
   ConfirmationDialog,
+  TextInput,
 } from '@primer/react';
-
 import DefaultLayout from '../../interface/DefaultLayout';
 import { formatCnpj, formatDate } from '../../interface';
-
 import { DataTable, SkeletonText, Table } from '@primer/react/experimental';
-import { PlusIcon, PencilIcon, TrashIcon } from '@primer/octicons-react';
-
-import { useState } from 'react';
-
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  SearchIcon,
+} from '@primer/octicons-react';
+import { useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 type Company = {
@@ -30,9 +32,12 @@ type Company = {
 
 async function fetchAPI<T>(key: string): Promise<T> {
   const response = await fetch(key);
-  const responseBody = await response.json();
 
-  return responseBody;
+  if (!response.ok) {
+    throw new Error('Não foi possível carregar as empresas');
+  }
+
+  return response.json();
 }
 
 export default function ListPage() {
@@ -47,6 +52,7 @@ export default function ListPage() {
       <Stack gap="spacious">
         <Stack direction="horizontal" justify="space-between" align="center">
           <Heading as="h1">Empresas</Heading>
+
           <Button as="a" href="/empresas/cadastrar" variant="primary">
             <PlusIcon size={16} />
             Cadastrar Nova Empresa
@@ -60,6 +66,7 @@ export default function ListPage() {
 }
 
 function CompanyList() {
+  const [search, setSearch] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
 
@@ -69,6 +76,27 @@ function CompanyList() {
     isLoading,
     mutate,
   } = useSWR<Company[]>('http://localhost:3000/api/v1/companies', fetchAPI);
+
+  const filteredCompanies = useMemo(() => {
+    if (!companies) {
+      return [];
+    }
+
+    const normalizedSearch = search.trim().toLocaleLowerCase();
+
+    if (!normalizedSearch) {
+      return companies;
+    }
+
+    return companies.filter((company) => {
+      return [
+        company.name,
+        company.cnpj,
+        company.trade_name,
+        company.address,
+      ].some((field) => field.toLocaleLowerCase().includes(normalizedSearch));
+    });
+  }, [companies, search]);
 
   if (isLoading) {
     return <CompanyListSkeleton />;
@@ -99,7 +127,6 @@ function CompanyList() {
       }
 
       setCompanyToDelete(null);
-
       await mutate();
     } catch (error) {
       console.error(error);
@@ -114,99 +141,111 @@ function CompanyList() {
 
   return (
     <>
-      <Table.Container>
-        <DataTable
-          aria-labelledby="companies-list"
-          data={companies}
-          columns={[
-            {
-              header: 'Nome',
-              field: 'name',
-              rowHeader: true,
-            },
-            {
-              header: 'CNPJ',
-              field: 'cnpj',
-              renderCell: (row) => formatCnpj(row.cnpj),
-            },
-            {
-              header: 'Nome Fantasia',
-              field: 'trade_name',
-            },
-            {
-              header: 'Endereço',
-              field: 'address',
-            },
-            {
-              header: 'Criado em',
-              field: 'created_at',
-              renderCell: (row) => formatDate(row.created_at),
-            },
-            {
-              header: 'Alterado em',
-              field: 'updated_at',
-              renderCell: (row) => formatDate(row.updated_at),
-            },
-            {
-              id: 'actions',
-              header: () => (
-                <span
-                  style={{
-                    clipPath: 'inset(50%)',
-                    height: '1px',
-                    overflow: 'hidden',
-                    position: 'absolute',
-                    whiteSpace: 'nowrap',
-                    width: '1px',
-                  }}
-                >
-                  Ações
-                </span>
-              ),
-              renderCell: (row) => (
-                <>
-                  <IconButton
-                    aria-label={'Editar'}
-                    icon={PencilIcon}
-                    variant="invisible"
-                    as="a"
-                    href={`/empresas/editar/${row.id}`}
-                  />
+      <TextInput
+        leadingVisual={SearchIcon}
+        placeholder="Buscar por nome, CNPJ, nome fantasia ou endereço"
+        aria-label="Buscar empresas"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+      />
 
-                  <IconButton
-                    aria-label={'Excluir'}
-                    icon={TrashIcon}
-                    variant="invisible"
-                    onClick={() => setCompanyToDelete(row)}
-                    disabled={deletingId === row.id}
-                  />
-                </>
-              ),
-            },
-          ]}
-        />
+      {filteredCompanies.length === 0 ? (
+        <Text size="medium">Nenhuma empresa encontrada para "{search}".</Text>
+      ) : (
+        <Table.Container>
+          <DataTable
+            aria-labelledby="companies-list"
+            data={filteredCompanies}
+            columns={[
+              {
+                header: 'Nome',
+                field: 'name',
+                rowHeader: true,
+              },
+              {
+                header: 'CNPJ',
+                field: 'cnpj',
+                renderCell: (row) => formatCnpj(row.cnpj),
+              },
+              {
+                header: 'Nome Fantasia',
+                field: 'trade_name',
+              },
+              {
+                header: 'Endereço',
+                field: 'address',
+              },
+              {
+                header: 'Criado em',
+                field: 'created_at',
+                renderCell: (row) => formatDate(row.created_at),
+              },
+              {
+                header: 'Alterado em',
+                field: 'updated_at',
+                renderCell: (row) => formatDate(row.updated_at),
+              },
+              {
+                id: 'actions',
+                header: () => (
+                  <span
+                    style={{
+                      clipPath: 'inset(50%)',
+                      height: '1px',
+                      overflow: 'hidden',
+                      position: 'absolute',
+                      whiteSpace: 'nowrap',
+                      width: '1px',
+                    }}
+                  >
+                    Ações
+                  </span>
+                ),
+                renderCell: (row) => (
+                  <>
+                    <IconButton
+                      aria-label="Editar"
+                      icon={PencilIcon}
+                      variant="invisible"
+                      as="a"
+                      href={`/empresas/editar/${row.id}`}
+                    />
 
-        {companyToDelete ? (
-          <ConfirmationDialog
-            title={`Excluir ${companyToDelete.name}?`}
-            width="large"
-            height="auto"
-            confirmButtonContent="Excluir"
-            cancelButtonContent="Cancelar"
-            confirmButtonType="danger"
-            onClose={(reason) => {
-              if (reason === 'confirm') {
-                handleDelete(companyToDelete.id);
-              } else {
-                setCompanyToDelete(null);
-              }
-            }}
-          >
-            Tem certeza que deseja excluir esta empresa? Essa ação não pode ser
-            desfeita.
-          </ConfirmationDialog>
-        ) : null}
-      </Table.Container>
+                    <IconButton
+                      aria-label="Excluir"
+                      icon={TrashIcon}
+                      variant="invisible"
+                      onClick={() => setCompanyToDelete(row)}
+                      disabled={deletingId === row.id}
+                    />
+                  </>
+                ),
+              },
+            ]}
+          />
+
+          {companyToDelete ? (
+            <ConfirmationDialog
+              title={`Excluir ${companyToDelete.name}?`}
+              width="large"
+              height="auto"
+              confirmButtonContent="Excluir"
+              cancelButtonContent="Cancelar"
+              confirmButtonType="danger"
+              onClose={(reason) => {
+                if (reason === 'confirm') {
+                  handleDelete(companyToDelete.id);
+                } else {
+                  setCompanyToDelete(null);
+                }
+              }}
+            >
+              Tem certeza que deseja excluir esta empresa? Essa ação não pode
+              ser desfeita.
+            </ConfirmationDialog>
+          ) : null}
+        </Table.Container>
+      )}
     </>
   );
 }
