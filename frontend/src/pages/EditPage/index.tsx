@@ -7,11 +7,14 @@ import {
   Banner,
 } from '@primer/react';
 import { SkeletonText } from '@primer/react/experimental';
+import { ArrowLeftIcon } from '@primer/octicons-react';
 
 import DefaultLayout from '../../interface/DefaultLayout';
 import type React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
+
+import { createErrorMessage, formatCnpj } from '../../interface';
 import useSWR from 'swr';
 
 type CompanyFormData = {
@@ -36,6 +39,7 @@ async function fetchAPI<T>(url: string): Promise<T> {
 
 export default function EditPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   return (
     <DefaultLayout
@@ -46,6 +50,16 @@ export default function EditPage() {
       }}
     >
       <Stack gap="spacious">
+        <Stack align="start">
+          <Button
+            leadingVisual={ArrowLeftIcon}
+            variant="invisible"
+            onClick={() => navigate('/empresas')}
+          >
+            Voltar
+          </Button>
+        </Stack>
+
         <Heading as="h1">Editar Empresa</Heading>
 
         <EditForm companyId={id} />
@@ -75,6 +89,18 @@ function EditForm({ companyId }: EditFormProps) {
   const [tradeName, setTradeName] = useState<string>();
   const [address, setAddress] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof CompanyFormData, string>>
+  >({});
+
+  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
+
+  const KNOWN_FIELDS: Array<keyof CompanyFormData> = [
+    'name',
+    'cnpj',
+    'trade_name',
+    'address',
+  ];
 
   if (isLoading) {
     return <EditFormSkeleton />;
@@ -98,16 +124,19 @@ function EditForm({ companyId }: EditFormProps) {
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setIsSubmitting(true);
+    setFieldErrors({});
+    setGlobalMessage(null);
 
     if (!companyId) return;
 
+    setIsSubmitting(true);
+
     try {
       const requestBody = {
-        name,
-        cnpj,
-        trade_name: tradeName,
-        address,
+        name: currentName,
+        cnpj: currentCnpj,
+        trade_name: currentTradeName,
+        address: currentAddress,
       };
 
       const response = await fetch(
@@ -121,12 +150,34 @@ function EditForm({ companyId }: EditFormProps) {
         },
       );
 
+      const responseBody = await response.json();
+
       if (response.status === 200) {
         navigate('/empresas');
         return;
       }
+
+      if (
+        response.status === 400 &&
+        responseBody.key &&
+        KNOWN_FIELDS.includes(responseBody.key as keyof CompanyFormData)
+      ) {
+        const field = responseBody.key as keyof CompanyFormData;
+
+        setFieldErrors({
+          [field]: createErrorMessage(responseBody, {
+            omitAction: true,
+          }),
+        });
+      } else {
+        setGlobalMessage(createErrorMessage(responseBody));
+      }
     } catch (error) {
       console.error(error);
+
+      setGlobalMessage(
+        'Não foi possível atualizar a empresa. Tente novamente mais tarde.',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -145,6 +196,11 @@ function EditForm({ companyId }: EditFormProps) {
             value={currentName}
             onChange={(event) => setName(event.target.value)}
           />
+          {fieldErrors.name && (
+            <FormControl.Validation variant="error">
+              {fieldErrors.name}
+            </FormControl.Validation>
+          )}
         </FormControl>
 
         <FormControl>
@@ -155,8 +211,14 @@ function EditForm({ companyId }: EditFormProps) {
             type="text"
             placeholder="Ex.: 12.345.678/0001-90"
             value={currentCnpj}
-            onChange={(event) => setCnpj(event.target.value)}
+            onChange={(event) => setCnpj(formatCnpj(event.target.value))}
           />
+
+          {fieldErrors.cnpj && (
+            <FormControl.Validation variant="error">
+              {fieldErrors.cnpj}
+            </FormControl.Validation>
+          )}
         </FormControl>
 
         <FormControl>
@@ -169,6 +231,12 @@ function EditForm({ companyId }: EditFormProps) {
             value={currentTradeName}
             onChange={(event) => setTradeName(event.target.value)}
           />
+
+          {fieldErrors.trade_name && (
+            <FormControl.Validation variant="error">
+              {fieldErrors.trade_name}
+            </FormControl.Validation>
+          )}
         </FormControl>
 
         <FormControl>
@@ -181,7 +249,15 @@ function EditForm({ companyId }: EditFormProps) {
             value={currentAddress}
             onChange={(event) => setAddress(event.target.value)}
           />
+
+          {fieldErrors.address && (
+            <FormControl.Validation variant="error">
+              {fieldErrors.address}
+            </FormControl.Validation>
+          )}
         </FormControl>
+
+        {globalMessage && <Banner variant="critical" title={globalMessage} />}
 
         <Button
           block
