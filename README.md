@@ -53,7 +53,7 @@ Pré-requisitos: **Node.js** e **Docker** instalados.
 
 2. **Subir os containers** (banco de dados e Mailcatcher)
    ```bash
-    npm run services:up"
+    npm run services:up
    ```
 
 3. **Rodar as migrações**
