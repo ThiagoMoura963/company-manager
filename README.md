@@ -28,6 +28,16 @@ Aplicação full stack para cadastro, consulta, edição e exclusão de empresas
 
 ---
 
+### Mailcatcher
+
+O Mailcatcher é utilizado localmente para interceptar e visualizar os e-mails enviados pela aplicação durante o desenvolvimento.
+
+A interface web do Mailcatcher está disponível em:
+
+**http://localhost:1080**
+
+---
+
 ## Como Rodar o Projeto
 
 Pré-requisitos: **Node.js** e **Docker** instalados.
